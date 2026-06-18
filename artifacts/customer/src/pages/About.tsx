@@ -1,4 +1,4 @@
-import { MapPin, Phone, Clock, Instagram } from "lucide-react";
+ï»¿import { MapPin, Phone, Clock, Instagram } from "lucide-react";
 
 export default function About() {
   return (
@@ -9,8 +9,8 @@ export default function About() {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-40"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
         <div className="absolute bottom-6 left-6 right-6">
-          <h1 className="text-4xl font-serif text-white mb-2">PL?OFY</h1>
-          <p className="text-primary font-medium tracking-widest uppercase text-sm">RESTAURANT PL?OFY — TLEMCEN</p>
+          <h1 className="text-4xl font-serif text-white mb-2">PLOOFY</h1>
+          <p className="text-primary font-medium tracking-widest uppercase text-sm">RESTAURANT PLOOFY â€” TLEMCEN</p>
         </div>
       </div>
 
@@ -24,7 +24,7 @@ export default function About() {
           <div>
             <h3 className="font-semibold text-foreground mb-1">Adresse</h3>
             <p className="text-muted-foreground text-sm">
-              Résidence Salef El Adraa, Kiffen<br />
+              Residence Salef El Adraa, Kiffen<br />
               Tlemcen 13000
             </p>
             <p className="text-primary text-xs mt-1 underline">Ouvrir dans Maps</p>
@@ -37,11 +37,11 @@ export default function About() {
             <Clock className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-semibold text-foreground mb-2">Horaires d'ouverture</h3>
+            <h3 className="font-semibold text-foreground mb-2">Horaires d ouverture</h3>
             <div className="text-muted-foreground text-sm space-y-1">
               <div className="flex justify-between gap-8">
                 <span>Tous les jours</span>
-                <span className="text-foreground">Jusqu'à 23:55</span>
+                <span className="text-foreground">Jusqu a 23:55</span>
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function About() {
           <div>
             <h3 className="font-semibold text-foreground mb-1">Instagram</h3>
             <p className="text-primary text-sm font-medium">@ploofy13</p>
-            <p className="text-muted-foreground text-xs mt-1">21.4K abonnés · Ouvrir Instagram</p>
+            <p className="text-muted-foreground text-xs mt-1">21.4K abonnes - Ouvrir Instagram</p>
           </div>
         </div>
 
