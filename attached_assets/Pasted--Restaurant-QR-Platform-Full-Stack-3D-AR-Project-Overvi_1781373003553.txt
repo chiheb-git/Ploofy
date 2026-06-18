@@ -1,0 +1,402 @@
+# Restaurant QR Platform — Full Stack + 3D AR
+
+## Project Overview
+Build a **production-grade, ultra-professional restaurant management platform** with three parts:
+1. **Customer Mobile App** (PWA — Android & iOS via browser)
+2. **Admin Dashboard** (React + Vite — web)
+3. **3D AR Viewer** per dish using real AI-generated `.glb` models
+
+All three share a single **Node.js/Express backend** connected to **Neon PostgreSQL**.
+
+---
+
+## Tech Stack (mandatory, no substitutions)
+
+| Layer | Technology |
+|---|---|
+| Database | Neon PostgreSQL (`@neondatabase/serverless`) |
+| Backend | Node.js + Express + Prisma ORM |
+| Admin Frontend | React + Vite + TypeScript + TailwindCSS |
+| Customer App | React PWA (Vite) — mobile-first, installable Android & iOS |
+| 3D AR | `@google/model-viewer` web component |
+| QR Generation | `qrcode` npm package (server-side PNG) |
+| 3D File Storage | `/public/models/` directory served statically |
+
+---
+
+## Database Schema (Neon PostgreSQL)
+
+```sql
+CREATE TABLE categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  icon VARCHAR(50),
+  sort_order INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE dishes (
+  id SERIAL PRIMARY KEY,
+  category_id INT REFERENCES categories(id) ON DELETE CASCADE,
+  name VARCHAR(150) NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  image_url TEXT,
+  model_glb_url TEXT,
+  is_available BOOLEAN DEFAULT TRUE,
+  sort_order INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE qr_codes (
+  id SERIAL PRIMARY KEY,
+  label VARCHAR(100),
+  target_url TEXT NOT NULL,
+  png_base64 TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+Seed with: 4 categories (Pizza, Sandwich, Boisson, Dessert), 3 dishes each. Use realistic Algerian menu names and prices in DZD.
+
+---
+
+## Backend API (Node.js + Express)
+
+Base URL: `/api`
+
+**Categories**
+- `GET /api/categories` — list all with dish count
+- `POST /api/categories` — create
+- `PUT /api/categories/:id` — update
+- `DELETE /api/categories/:id` — delete
+
+**Dishes**
+- `GET /api/dishes?category_id=X` — list by category
+- `GET /api/dishes/:id` — full detail (includes model_glb_url)
+- `POST /api/dishes` — create
+- `PUT /api/dishes/:id` — update
+- `DELETE /api/dishes/:id` — delete
+
+**QR Codes**
+- `GET /api/qr` — get current QR
+- `POST /api/qr/generate` — generate new QR PNG pointing to `MENU_URL` env var
+- `GET /api/qr/download` — download PNG file
+
+**Static files**
+- Serve `/public/models/*.glb` files statically so model-viewer can load them via URL
+
+---
+
+## Application 1 — Customer Mobile PWA
+
+### Design (CRITICAL — non-negotiable)
+- **Luxury restaurant dark theme**
+- Background: `#0F0F0F` (main), `#1A1A1A` (cards), `#242424` (inputs)
+- Accent: warm gold `#C9A84C`, hover `#E2B95A`
+- Typography: Google Fonts — `Playfair Display` for headings, `Inter` for body text
+- Every tap: `active:scale-95 transition-all duration-150` — must feel premium
+- Skeleton loaders on ALL data fetches (never blank screens or spinners)
+- Bottom navigation bar: fixed, frosted glass (`backdrop-filter: blur(20px)`), 4 icons
+- Page transitions: fade + slight vertical slide (150ms)
+- Zero default browser chrome visible — full immersive PWA
+- Images: lazy loaded, blur-up placeholder, aspect-ratio locked containers
+- All touch targets minimum 48px height
+
+### Screens
+
+**Screen 1 — Home / Menu**
+- Hero banner with restaurant name, ambient overlay, tagline
+- Horizontal scrollable category chips with animated gold underline on active
+- Dish card list (vertical scroll):
+  - Full-width image (16:9 ratio, object-fit cover)
+  - Dish name (Playfair Display, 18px)
+  - Description truncated to 2 lines
+  - Price in DZD with gold color
+  - Subtle fade-up entrance animation on scroll
+
+**Screen 2 — Dish Detail**
+- Full-bleed hero image (300px height, object-fit cover)
+- Back button top-left with blur background pill
+- Dish name (Playfair Display, 26px)
+- Full description
+- Gold price badge
+- Tag chips (spicy, vegetarian, etc.) if available
+- **Primary CTA button: "Voir en 3D / AR"**
+  - Gold gradient background
+  - Only shown if `model_glb_url` exists for this dish
+  - Tapping navigates to the AR viewer screen
+
+**Screen 3 — AR / 3D Viewer**
+
+This is the most important screen. Implement it perfectly:
+
+```jsx
+import '@google/model-viewer';
+
+export function ARViewer({ dish }) {
+  if (!dish.model_glb_url) {
+    return (
+      <div className="ar-unavailable">
+        <p>Modèle 3D non disponible pour ce plat</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ width: '100vw', height: '100vh', background: '#000', position: 'relative' }}>
+      <model-viewer
+        src={dish.model_glb_url}
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        camera-controls
+        auto-rotate
+        auto-rotate-delay="0"
+        rotation-per-second="20deg"
+        shadow-intensity="1.5"
+        shadow-softness="1"
+        environment-image="neutral"
+        exposure="0.85"
+        tone-mapping="commerce"
+        style={{ width: '100%', height: '100%' }}
+      >
+        <button
+          slot="ar-button"
+          style={{
+            position: 'absolute',
+            bottom: '32px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'linear-gradient(135deg, #C9A84C, #E2B95A)',
+            color: '#0F0F0F',
+            border: 'none',
+            borderRadius: '50px',
+            padding: '14px 32px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
+        >
+          Placer sur ma table
+        </button>
+      </model-viewer>
+
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: '50px',
+          color: '#fff',
+          padding: '8px 18px',
+          fontSize: '14px',
+          cursor: 'pointer',
+        }}
+      >
+        Retour
+      </button>
+
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        background: 'rgba(0,0,0,0.6)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(201,168,76,0.4)',
+        borderRadius: '12px',
+        padding: '8px 14px',
+        color: '#C9A84C',
+        fontSize: '13px',
+      }}>
+        {dish.name}
+      </div>
+    </div>
+  );
+}
+```
+
+**Behavior on device:**
+- Android (Chrome) → WebXR activates automatically, dish appears in real size on table
+- iPhone (Safari) → Quick Look activates automatically
+- Desktop → 3D interactive viewer with mouse orbit controls
+- If no AR available → show interactive 3D only, no crash
+
+### PWA Manifest
+```json
+{
+  "name": "Restaurant Menu",
+  "short_name": "Menu",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0F0F0F",
+  "background_color": "#0F0F0F",
+  "start_url": "/",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
+```
+
+---
+
+## Application 2 — Admin Dashboard (React + Vite)
+
+### Design
+- Clean modern SaaS: white/light-gray base, dark left sidebar (`#1E1E2E`)
+- Sidebar: logo top, nav links with active gold indicator, collapsed on mobile
+- TailwindCSS throughout
+- Toast notifications (react-hot-toast) for every CRUD operation
+- Confirmation modal before any delete
+- Form validation before API call
+- Fully responsive: desktop + tablet
+
+### Pages
+
+**Dashboard Home**
+- Stats cards: total dishes, total categories, models 3D uploaded count
+- Quick action buttons: "Ajouter un plat", "Nouveau QR Code"
+
+**Categories**
+- Table: name, icon, dish count, actions (edit / delete)
+- Modal form: name + icon emoji picker
+
+**Dishes**
+- Filter by category (tabs)
+- Grid of cards with image thumbnail, name, price, availability toggle
+- Create/Edit modal form:
+  - Name, description, price (DZD)
+  - Image URL field
+  - `.glb` model URL field (with label: "URL du modèle 3D — généré via Meshy.ai + Luma AI + Blender")
+  - Category selector
+  - Available toggle
+- In the form, show a small info box explaining the 3D pipeline:
+  ```
+  Comment obtenir le fichier .glb :
+  1. Photo du plat → Meshy.ai (Image to 3D)
+  2. Amélioration → Luma AI
+  3. Retexture IA → Blender + Dream Textures
+  4. Export → glTF 2.0 + compression Draco
+  5. Héberger le .glb et coller l'URL ici
+  ```
+
+**QR Code Manager**
+- Large QR code displayed center (500x500px)
+- Text: "Ce QR code est identique pour toutes les tables. Il pointe vers l'URL fixe du menu."
+- "Régénérer le QR" button → calls `POST /api/qr/generate`
+- "Télécharger PNG" button → download for printing
+- "Imprimer" button → opens print dialog
+- Show current target URL below the QR
+
+---
+
+## 3D AR Integration — Full Technical Detail
+
+### How the pipeline works (implement the storage + serving)
+
+1. 3D models are generated externally using this AI pipeline:
+   - **Step 1**: Real photo of dish → **Meshy.ai** "Image to 3D" → base `.glb` model
+   - **Step 2**: Import `.glb` into **Luma AI** → improved lighting + textures
+   - **Step 3**: Open in **Blender** + **Dream Textures plugin** (Stable Diffusion) → AI retexture with prompt: `"[dish name], studio food photography, sharp details, 8K PBR texture, soft shadows, appetizing"`
+   - **Step 4**: Blender export → glTF 2.0 + Draco compression → final `.glb` file under 5MB
+
+2. The `.glb` file is uploaded to `/public/models/` in the project
+
+3. The admin sets the URL in the dish form: `https://yourapp.replit.app/models/pizza-reine.glb`
+
+4. The customer app loads it via `<model-viewer src={dish.model_glb_url}>`
+
+### Install model-viewer correctly
+```bash
+npm install @google/model-viewer
+```
+```jsx
+import '@google/model-viewer';
+// Then use <model-viewer> as a JSX element
+// Add to tsconfig: "types": ["@google/model-viewer"]
+```
+
+### model-viewer attributes for best food AR result
+```html
+ar
+ar-modes="webxr scene-viewer quick-look"
+camera-controls
+auto-rotate
+shadow-intensity="1.5"
+shadow-softness="1"
+environment-image="neutral"
+exposure="0.85"
+tone-mapping="commerce"
+scale="1 1 1"
+```
+
+`tone-mapping="commerce"` is critical — it makes food colors appear warm, rich, and appetizing instead of flat.
+
+### Fallback handling
+```jsx
+const [modelError, setModelError] = useState(false);
+
+<model-viewer
+  src={dish.model_glb_url}
+  onError={() => setModelError(true)}
+  ...
+/>
+
+{modelError && (
+  <div className="model-error">
+    Modèle 3D temporairement indisponible
+  </div>
+)}
+```
+
+---
+
+## Environment Variables
+
+```env
+DATABASE_URL=your_neon_postgresql_connection_string
+MENU_URL=https://your-customer-app.replit.app
+PORT=3000
+```
+
+---
+
+## Quality Standards (non-negotiable)
+
+1. Zero console errors in both apps
+2. Every API route has try/catch with correct HTTP codes (200, 201, 400, 404, 500)
+3. Every async operation has a loading state — skeleton loaders on customer app, spinners on admin
+4. Customer PWA scores 90+ on Lighthouse mobile
+5. No placeholder UI anywhere — every screen fully functional
+6. TypeScript strict mode on admin
+7. CORS correctly configured
+8. All forms validated client-side before API call
+9. model-viewer gracefully handles missing or broken .glb
+10. The AR button only appears on dish detail if model_glb_url is not null
+11. Images lazy loaded with aspect-ratio containers
+12. All prices displayed in DZD format: `1 200 DZD`
+13. App installable on Android and iOS as PWA (service worker + manifest)
+14. Dark theme has no white flash on page load (set background-color in index.html)
+
+---
+
+## Deliverables
+
+- `/backend` — Express API + static model serving
+- `/admin` — React + Vite admin dashboard
+- `/customer` — React PWA customer app
+- `schema.sql` — complete schema + DZD seed data
+- `README.md` — full setup, env vars, 3D pipeline instructions, deploy guide
+
+**Start order:**
+1. Scaffold all three projects
+2. Connect Neon + run migrations + seed
+3. Build all backend routes
+4. Build admin dashboard (all 4 pages)
+5. Build customer PWA (all 3 screens)
+6. Test AR viewer with a sample .glb file from https://modelviewer.dev/shared-assets/models/Astronaut.glb
+7. Show working demo: backend :3000 · admin :5173 · customer :5174

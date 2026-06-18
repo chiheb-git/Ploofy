@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "EiSVQA3NIUolI4v9AnRas"
+uri = "file://artifacts/customer/public/placeholder-pizza.png"
+type = "image"
+title = "Pizza placeholder"
+
+[[generated]]
+id = "0xQ2tgFMwLkXQfP-78qLD"
+uri = "file://artifacts/customer/public/placeholder-sandwich.png"
+type = "image"
+title = "Sandwich placeholder"
+
+[[generated]]
+id = "oByjYeuKfgNJr67c-FdC0"
+uri = "file://artifacts/customer/public/placeholder-boisson.png"
+type = "image"
+title = "Drink placeholder"
+
+[[generated]]
+id = "ouU5r_rkxXy7pIuWDmrdL"
+uri = "file://artifacts/customer/public/placeholder-dessert.png"
+type = "image"
+title = "Dessert placeholder"
