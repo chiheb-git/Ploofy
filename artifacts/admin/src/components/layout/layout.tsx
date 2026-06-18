@@ -21,7 +21,7 @@ export function Sidebar() {
     <>
       {/* Mobile toggle */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-sidebar border-b border-sidebar-border flex items-center justify-between px-4 z-50">
-        <div className="text-sidebar-foreground font-serif font-bold text-lg">Le Palais d'Orient</div>
+        <div className="text-sidebar-foreground font-serif font-bold text-lg">Ploofy</div>
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-sidebar-foreground hover:bg-sidebar-accent">
           {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
@@ -41,7 +41,7 @@ export function Sidebar() {
         isOpen ? "translate-x-0 mt-16 md:mt-0" : "-translate-x-full md:mt-0"
       )}>
         <div className="hidden md:flex h-16 items-center px-6 border-b border-sidebar-border">
-          <div className="text-sidebar-foreground font-serif font-bold text-xl tracking-wide">Le Palais d'Orient</div>
+          <div className="text-sidebar-foreground font-serif font-bold text-xl tracking-wide">Ploofy</div>
         </div>
 
         <nav className="flex-1 py-6 px-3 space-y-1">
