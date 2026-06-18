@@ -6,7 +6,7 @@ export default function About() {
 
       {/* Hero */}
       <div className="relative w-full h-64 bg-card border-b border-border">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-40"></div>
+        <div className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center opacity-40"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
         <div className="absolute bottom-6 left-6 right-6">
           <h1 className="text-4xl font-serif text-white mb-2">PLOOFY</h1>
