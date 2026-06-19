@@ -4,7 +4,8 @@ import categoriesRouter from "./categories";
 import dishesRouter from "./dishes";
 import qrRouter from "./qr";
 import statsRouter from "./stats";
-import uploadRouter from "./upload";`r`nimport settingsRouter from "./settings";
+import uploadRouter from "./upload";
+import settingsRouter from "./settings";
 
 const router: IRouter = Router();
 
