@@ -61,9 +61,7 @@ export default function DishDetail() {
     return (
       <div className="min-h-screen flex flex-col bg-background relative pb-32">
         <div className="px-6 pt-8 pb-10" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
-          <Link href="/" className="inline-flex items-center justify-center bg-card p-3 rounded-full border border-border tap-effect text-foreground mb-8">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
+          <button onClick={() => window.history.back()} className="inline-flex items-center justify-center bg-card p-3 rounded-full border border-border tap-effect text-foreground mb-8"><ArrowLeft className="w-5 h-5" /></button>
 
           <div style={{ width: "40px", height: "2px", background: "linear-gradient(90deg, #C9A84C, transparent)", marginBottom: "20px" }} />
 
@@ -126,9 +124,7 @@ export default function DishDetail() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
 
-        <Link href="/" className="absolute top-6 left-4 bg-background/40 backdrop-blur-md p-3 rounded-full border border-white/10 tap-effect text-foreground">
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
+        <button onClick={() => window.history.back()} className="absolute top-6 left-4 bg-background/40 backdrop-blur-md p-3 rounded-full border border-white/10 tap-effect text-foreground"><ArrowLeft className="w-5 h-5" /></button>
       </div>
 
       <div className="px-6 -mt-12 relative z-10">
@@ -172,3 +168,4 @@ export default function DishDetail() {
     </div>
   );
 }
+

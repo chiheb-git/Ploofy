@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation, useSearch } from 'wouter';
 import { useListCategories, useListDishes } from '@workspace/api-client-react';
 import { formatPrice, cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -7,7 +7,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState<number | null>(null);
+  const search = useSearch();
+  const [, navigate] = useLocation();
+  const initialCategory = new URLSearchParams(search).get('category');
+  const [activeCategory, setActiveCategory] = useState<number | null>(
+    initialCategory ? Number(initialCategory) : null
+  );
   const [showPhotos, setShowPhotos] = useState(true);
   const { data: categoriesRaw, isLoading: isLoadingCategories } = useListCategories();
   const { data: dishesRaw, isLoading: isLoadingDishes } = useListDishes(
@@ -20,6 +25,11 @@ export default function Home() {
       .then((data) => setShowPhotos(data.showPhotos))
       .catch(() => setShowPhotos(true));
   }, []);
+
+  const selectCategory = (id: number | null) => {
+    setActiveCategory(id);
+    navigate(id ? `/?category=${id}` : '/');
+  };
 
   const getFallbackImage = (categoryId?: number | null) => {
     if (!categoryId) return '/placeholder-pizza.png';
@@ -50,7 +60,7 @@ export default function Home() {
       <div className="sticky top-0 z-40 backdrop-blur-xl border-b border-white/5 py-4" style={{background:"rgba(10,10,10,0.9)"}}>
         <div className="flex overflow-x-auto px-6 gap-3 no-scrollbar" style={{scrollbarWidth:"none"}}>
           <button
-            onClick={() => setActiveCategory(null)}
+            onClick={() => selectCategory(null)}
             className={cn(
               "px-5 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all tap-effect",
               activeCategory === null
@@ -68,7 +78,7 @@ export default function Home() {
             categories.map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
+                onClick={() => selectCategory(cat.id)}
                 className={cn(
                   "px-5 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all tap-effect",
                   activeCategory === cat.id
@@ -101,7 +111,6 @@ export default function Home() {
             Aucun plat trouve dans cette categorie.
           </div>
         ) : showPhotos ? (
-          // ---- Affichage AVEC photos ----
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {dishes.map((dish) => (
               <Link key={dish.id} href={"/dish/" + dish.id} className="group tap-effect block">
@@ -142,7 +151,6 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          // ---- Affichage SANS photos, style liste elegante ----
           <div className="max-w-3xl mx-auto divide-y divide-white/5">
             {dishes.map((dish) => (
               <Link key={dish.id} href={"/dish/" + dish.id} className="group tap-effect block">
