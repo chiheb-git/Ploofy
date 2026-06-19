@@ -1,13 +1,35 @@
 ﻿import { useGetStats, useGetQrCode } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UtensilsCrossed, List, Box, QrCode, Plus } from "lucide-react";
+import { UtensilsCrossed, List, Box, QrCode, Plus, ImageIcon, ImageOff } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
+
+const API_BASE = import.meta.env.VITE_API_URL || "";
 
 export default function Dashboard() {
   const { data: stats, isLoading: isLoadingStats } = useGetStats();
   const { data: qrCode, isLoading: isLoadingQr } = useGetQrCode();
+  const [showPhotos, setShowPhotos] = useState(true);
+  const [loadingToggle, setLoadingToggle] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/settings`)
+      .then((r) => r.json())
+      .then((data) => setShowPhotos(data.showPhotos))
+      .finally(() => setLoadingToggle(false));
+  }, []);
+
+  const toggle = async () => {
+    const newValue = !showPhotos;
+    setShowPhotos(newValue);
+    await fetch(`${API_BASE}/api/settings`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ showPhotos: newValue }),
+    });
+  };
 
   return (
     <div className="py-8 space-y-8">
@@ -44,7 +66,7 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Catégories</CardTitle>
@@ -75,6 +97,40 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Affichage des photos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {showPhotos ? (
+                  <ImageIcon className="h-5 w-5 text-primary" />
+                ) : (
+                  <ImageOff className="h-5 w-5 text-muted-foreground" />
+                )}
+                <div>
+                  <p className="font-medium">
+                    {showPhotos ? "Photos activées" : "Photos désactivées"}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {showPhotos
+                      ? "Le menu client affiche les photos des plats."
+                      : "Le menu client affiche une liste élégante sans photos."}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={toggle}
+                disabled={loadingToggle}
+                variant={showPhotos ? "default" : "outline"}
+              >
+                {showPhotos ? "Désactiver" : "Activer"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="col-span-1">
           <CardHeader>
             <CardTitle>Menu QR Actif</CardTitle>
@@ -84,9 +140,9 @@ export default function Dashboard() {
               <Skeleton className="h-48 w-48 rounded-lg" />
             ) : qrCode?.pngBase64 ? (
               <div className="space-y-4 text-center">
-                <img 
-                  src={qrCode.pngBase64?.startsWith("data:") ? qrCode.pngBase64 : `data:image/png;base64,${qrCode.pngBase64}`} 
-                  alt="QR Code" 
+                <img
+                  src={qrCode.pngBase64?.startsWith("data:") ? qrCode.pngBase64 : `data:image/png;base64,${qrCode.pngBase64}`}
+                  alt="QR Code"
                   className="w-48 h-48 border rounded-lg p-2 bg-white mx-auto"
                 />
                 <p className="text-sm text-muted-foreground truncate max-w-xs">{qrCode.targetUrl}</p>
@@ -110,4 +166,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

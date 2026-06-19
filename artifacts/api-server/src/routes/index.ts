@@ -4,7 +4,7 @@ import categoriesRouter from "./categories";
 import dishesRouter from "./dishes";
 import qrRouter from "./qr";
 import statsRouter from "./stats";
-import uploadRouter from "./upload";
+import uploadRouter from "./upload";`r`nimport settingsRouter from "./settings";
 
 const router: IRouter = Router();
 
@@ -14,5 +14,6 @@ router.use(dishesRouter);
 router.use(qrRouter);
 router.use(statsRouter);
 router.use(uploadRouter);
+router.use(settingsRouter);
 
 export default router;

@@ -1,15 +1,25 @@
-import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useListCategories, useListDishes } from '@workspace/api-client-react';
 import { formatPrice, cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
+  const [showPhotos, setShowPhotos] = useState(true);
   const { data: categoriesRaw, isLoading: isLoadingCategories } = useListCategories();
   const { data: dishesRaw, isLoading: isLoadingDishes } = useListDishes(
     activeCategory ? { category_id: activeCategory } : {}
   );
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/settings`)
+      .then((r) => r.json())
+      .then((data) => setShowPhotos(data.showPhotos))
+      .catch(() => setShowPhotos(true));
+  }, []);
 
   const getFallbackImage = (categoryId?: number | null) => {
     if (!categoryId) return '/placeholder-pizza.png';
@@ -90,7 +100,8 @@ export default function Home() {
           <div className="py-20 text-center text-muted-foreground">
             Aucun plat trouve dans cette categorie.
           </div>
-        ) : (
+        ) : showPhotos ? (
+          // ---- Affichage AVEC photos ----
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {dishes.map((dish) => (
               <Link key={dish.id} href={"/dish/" + dish.id} className="group tap-effect block">
@@ -126,6 +137,36 @@ export default function Home() {
                       3D AR
                     </div>
                   )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          // ---- Affichage SANS photos, style liste elegante ----
+          <div className="max-w-3xl mx-auto divide-y divide-white/5">
+            {dishes.map((dish) => (
+              <Link key={dish.id} href={"/dish/" + dish.id} className="group tap-effect block">
+                <div className="flex items-center justify-between gap-4 py-5 px-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-foreground font-semibold text-base" style={{fontFamily:"serif"}}>{dish.name}</h3>
+                      {dish.modelGlbUrl && dish.isAvailable && (
+                        <span className="text-[10px] uppercase tracking-wide text-primary border border-primary/40 rounded-full px-2 py-0.5">3D AR</span>
+                      )}
+                      {!dish.isAvailable && (
+                        <span className="text-[10px] uppercase tracking-wide text-muted-foreground border border-border rounded-full px-2 py-0.5">Epuise</span>
+                      )}
+                    </div>
+                    {dish.description && (
+                      <p className="text-muted-foreground text-sm mt-1 line-clamp-2">{dish.description}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-primary font-bold text-base whitespace-nowrap">{formatPrice(dish.price)}</span>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{background:"rgba(201,168,76,0.12)",border:"1px solid rgba(201,168,76,0.35)"}}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                    </div>
+                  </div>
                 </div>
               </Link>
             ))}
