@@ -115,10 +115,10 @@ export default function CategoriesPage() {
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getListCategoriesQueryKey() });
-            toast.success("Catأ©gorie mise أ  jour");
+            toast.success("Categorie mise a jour");
             handleCloseModal();
           },
-          onError: () => toast.error("Erreur lors de la mise أ  jour"),
+          onError: () => toast.error("Erreur lors de la mise a jour"),
         }
       );
     } else {
@@ -127,10 +127,10 @@ export default function CategoriesPage() {
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getListCategoriesQueryKey() });
-            toast.success("Catأ©gorie crأ©أ©e");
+            toast.success("Categorie creee");
             handleCloseModal();
           },
-          onError: () => toast.error("Erreur lors de la crأ©ation"),
+          onError: () => toast.error("Erreur lors de la creation"),
         }
       );
     }
@@ -144,7 +144,7 @@ export default function CategoriesPage() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListCategoriesQueryKey() });
-          toast.success("Catأ©gorie supprimأ©e");
+          toast.success("Categorie supprimee");
           setDeletingCategory(null);
         },
         onError: () => toast.error("Erreur lors de la suppression"),
@@ -158,11 +158,11 @@ export default function CategoriesPage() {
     <div className="py-8 space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Catأ©gories</h1>
-          <p className="text-muted-foreground mt-1">Gأ©rez les catأ©gories de votre menu.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
+          <p className="text-muted-foreground mt-1">Gerez les Categories de votre menu.</p>
         </div>
         <Button onClick={() => handleOpenModal()} className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Plus className="mr-2 h-4 w-4" /> Ajouter une catأ©gorie
+          <Plus className="mr-2 h-4 w-4" /> Ajouter une categorie
         </Button>
       </div>
 
@@ -172,7 +172,7 @@ export default function CategoriesPage() {
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
               <TableHead>Nom</TableHead>
-              <TableHead>Icأ´ne</TableHead>
+              <TableHead>Icone</TableHead>
               <TableHead className="text-center">Plats</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -191,7 +191,7 @@ export default function CategoriesPage() {
             ) : !categories || categories.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  Aucune catأ©gorie trouvأ©e.
+                  Aucune categorie trouvee.
                 </TableCell>
               </TableRow>
             ) : (
@@ -230,7 +230,7 @@ export default function CategoriesPage() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingCategory ? "Modifier la catأ©gorie" : "Ajouter une catأ©gorie"}</DialogTitle>
+            <DialogTitle>{editingCategory ? "Modifier la categorie" : "Ajouter une categorie"}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -241,7 +241,7 @@ export default function CategoriesPage() {
                   <FormItem>
                     <FormLabel>Nom</FormLabel>
                     <FormControl>
-                      <Input placeholder="ex: Entrأ©es" {...field} />
+                      <Input placeholder="ex: Entrees" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -252,7 +252,7 @@ export default function CategoriesPage() {
                 name="icon"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Icأ´ne (nom de l'icأ´ne)</FormLabel>
+                    <FormLabel>Icone (nom de l'Icone)</FormLabel>
                     <FormControl>
                       <Input placeholder="ex: star" {...field} />
                     </FormControl>
@@ -277,7 +277,7 @@ export default function CategoriesPage() {
                 <Button type="button" variant="outline" onClick={handleCloseModal}>Annuler</Button>
                 <Button type="submit" disabled={isPending}>
                   {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {editingCategory ? "Enregistrer" : "Crأ©er"}
+                  {editingCategory ? "Enregistrer" : "Creer"}
                 </Button>
               </div>
             </form>
@@ -288,9 +288,9 @@ export default function CategoriesPage() {
       <AlertDialog open={!!deletingCategory} onOpenChange={(open) => !open && setDeletingCategory(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>أٹtes-vous sأ»r ?</AlertDialogTitle>
+            <AlertDialogTitle>Etes-vous sur ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action est irrأ©versible. Elle supprimera la catأ©gorie "{deletingCategory?.name}".
+              Cette action est irreversible. Elle supprimera la categorie "{deletingCategory?.name}".
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -305,6 +305,9 @@ export default function CategoriesPage() {
     </div>
   );
 }
+
+
+
 
 
 
