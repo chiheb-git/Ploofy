@@ -1,58 +1,52 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
-
 @custom-variant dark (&:is(.dark *));
-
 :root {
-  --background: 0 0% 6%; /* #0F0F0F */
+  --background: 150 25% 10%; /* vert militaire profond */
   --foreground: 0 0% 96%;
-  --card: 0 0% 10%; /* #1A1A1A */
+  --card: 150 22% 14%;
   --card-foreground: 0 0% 96%;
-  --popover: 0 0% 10%;
+  --popover: 150 22% 14%;
   --popover-foreground: 0 0% 96%;
   --primary: 44 56% 54%; /* #C9A84C */
   --primary-foreground: 0 0% 6%;
-  --secondary: 0 0% 14%; /* #242424 */
+  --secondary: 150 20% 16%;
   --secondary-foreground: 0 0% 96%;
-  --muted: 0 0% 14%;
+  --muted: 150 20% 16%;
   --muted-foreground: 0 0% 65%;
   --accent: 44 68% 62%; /* #E2B95A */
   --accent-foreground: 0 0% 6%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 14%;
-  --input: 0 0% 14%; /* #242424 */
+  --border: 150 18% 18%;
+  --input: 150 18% 18%;
   --ring: 44 56% 54%;
-  
   --radius: 0.75rem;
-
   --app-font-sans: 'Inter', sans-serif;
   --app-font-serif: 'Playfair Display', serif;
 }
-
 .dark {
-  --background: 0 0% 6%;
+  --background: 150 25% 10%;
   --foreground: 0 0% 96%;
-  --card: 0 0% 10%;
+  --card: 150 22% 14%;
   --card-foreground: 0 0% 96%;
-  --popover: 0 0% 10%;
+  --popover: 150 22% 14%;
   --popover-foreground: 0 0% 96%;
   --primary: 44 56% 54%;
   --primary-foreground: 0 0% 6%;
-  --secondary: 0 0% 14%;
+  --secondary: 150 20% 16%;
   --secondary-foreground: 0 0% 96%;
-  --muted: 0 0% 14%;
+  --muted: 150 20% 16%;
   --muted-foreground: 0 0% 65%;
   --accent: 44 68% 62%;
   --accent-foreground: 0 0% 6%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 14%;
-  --input: 0 0% 14%;
+  --border: 150 18% 18%;
+  --input: 150 18% 18%;
   --ring: 44 56% 54%;
 }
-
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -73,38 +67,47 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-
   --font-sans: var(--app-font-sans);
   --font-serif: var(--app-font-serif);
 }
-
 @layer base {
   * {
     @apply border-border;
   }
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background-color: hsl(var(--background));
+    background-image: url('/logo-watermark.png');
+    background-repeat: no-repeat;
+    background-position: center 30vh;
+    background-size: min(70vw, 480px);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: hsl(var(--background));
+    opacity: 0.93;
+    z-index: -1;
+    pointer-events: none;
   }
   h1, h2, h3, h4, h5, h6, .font-serif {
     font-family: var(--app-font-serif);
   }
 }
-
 .tap-effect {
   @apply active:scale-95 transition-all duration-150;
 }
-
 .page-transition {
   animation: page-enter 150ms ease-out forwards;
 }
-
 @keyframes page-enter {
   0% { opacity: 0; transform: translateY(10px); }
   100% { opacity: 1; transform: translateY(0); }
 }
-
 .glass-nav {
-  background: rgba(26, 26, 26, 0.7);
+  background: rgba(20, 36, 26, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
