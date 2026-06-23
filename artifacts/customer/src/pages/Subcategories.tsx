@@ -35,7 +35,7 @@ export default function Subcategories() {
   }, [categoryId]);
 
   return (
-    <div className="flex flex-col w-full min-h-screen pb-6 bg-background">
+    <div className="flex flex-col w-full min-h-screen pb-6">
       <div className="px-6 pt-8 pb-6" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
         <Link href="/" className="inline-flex items-center justify-center bg-card p-3 rounded-full border border-border tap-effect text-foreground mb-6">
           <ArrowLeft className="w-5 h-5" />
@@ -76,3 +76,4 @@ export default function Subcategories() {
     </div>
   );
 }
+

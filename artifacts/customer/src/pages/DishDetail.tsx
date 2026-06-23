@@ -34,7 +34,7 @@ export default function DishDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col">
         <Skeleton className="w-full h-[300px] rounded-none" />
         <div className="p-6 space-y-4">
           <Skeleton className="h-8 w-3/4" />
@@ -59,7 +59,7 @@ export default function DishDetail() {
   // ---------------- Affichage SANS photo, design ultra pro ----------------
   if (!showPhotos) {
     return (
-      <div className="min-h-screen flex flex-col bg-background relative pb-32">
+      <div className="min-h-screen flex flex-col relative pb-32">
         <div className="px-6 pt-8 pb-10" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
           <button onClick={() => window.history.back()} className="inline-flex items-center justify-center bg-card p-3 rounded-full border border-border tap-effect text-foreground mb-8"><ArrowLeft className="w-5 h-5" /></button>
 
@@ -114,7 +114,7 @@ export default function DishDetail() {
 
   // ---------------- Affichage AVEC photo (original) ----------------
   return (
-    <div className="min-h-screen flex flex-col bg-background relative pb-32">
+    <div className="min-h-screen flex flex-col relative pb-32">
       <div className="relative w-full h-[350px] bg-card">
         <img
           src={dish.imageUrl || getFallbackImage(dish.categoryId)}
@@ -168,4 +168,5 @@ export default function DishDetail() {
     </div>
   );
 }
+
 
