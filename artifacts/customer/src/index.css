@@ -83,15 +83,7 @@
     background-size: min(70vw, 480px);
     background-attachment: fixed;
   }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: hsl(var(--background));
-    opacity: 0.93;
-    z-index: -1;
-    pointer-events: none;
-  }
+  
   h1, h2, h3, h4, h5, h6, .font-serif {
     font-family: var(--app-font-serif);
   }
@@ -112,3 +104,4 @@
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
+
