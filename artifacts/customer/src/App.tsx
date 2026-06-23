@@ -1,22 +1,28 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+﻿import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Layout from "@/components/Layout";
 import Home from "@/pages/Home";
+import Subcategories from "@/pages/Subcategories";
+import SubcategoryDishes from "@/pages/SubcategoryDishes";
 import DishDetail from "@/pages/DishDetail";
 import ARViewer from "@/pages/ARViewer";
 import About from "@/pages/About";
 import ARList from "@/pages/ARList";
-
 const queryClient = new QueryClient();
-
 function Router() {
   return (
     <Switch>
       <Route path="/">
         <Layout><Home /></Layout>
+      </Route>
+      <Route path="/category/:categoryId">
+        <Layout><Subcategories /></Layout>
+      </Route>
+      <Route path="/category/:categoryId/:subcategoryId">
+        <Layout><SubcategoryDishes /></Layout>
       </Route>
       <Route path="/dish/:id">
         <Layout><DishDetail /></Layout>
@@ -32,7 +38,6 @@ function Router() {
     </Switch>
   );
 }
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -45,5 +50,4 @@ function App() {
     </QueryClientProvider>
   );
 }
-
 export default App;

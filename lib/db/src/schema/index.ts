@@ -3,3 +3,5 @@ export * from "./dishes";
 export * from "./qr_codes";
 
 export * from "./settings";
+
+export * from "./subcategories";

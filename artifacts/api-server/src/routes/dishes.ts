@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+﻿import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, dishesTable } from "@workspace/db";
 import {
@@ -17,6 +17,7 @@ function formatDish(d: typeof dishesTable.$inferSelect) {
   return {
     id: d.id,
     categoryId: d.categoryId,
+    subcategoryId: d.subcategoryId,
     name: d.name,
     description: d.description,
     price: d.price,
@@ -34,7 +35,16 @@ router.get("/dishes", async (req, res): Promise<void> => {
     res.status(400).json({ error: params.error.message });
     return;
   }
-  let query = db.select().from(dishesTable).orderBy(dishesTable.sortOrder);
+  const subcategoryId = req.query.subcategory_id ? Number(req.query.subcategory_id) : undefined;
+  if (subcategoryId !== undefined) {
+    const dishes = await db
+      .select()
+      .from(dishesTable)
+      .where(eq(dishesTable.subcategoryId, subcategoryId))
+      .orderBy(dishesTable.sortOrder);
+    res.json(dishes.map(formatDish));
+    return;
+  }
   if (params.data.category_id !== undefined) {
     const dishes = await db
       .select()
@@ -44,7 +54,7 @@ router.get("/dishes", async (req, res): Promise<void> => {
     res.json(dishes.map(formatDish));
     return;
   }
-  const dishes = await query;
+  const dishes = await db.select().from(dishesTable).orderBy(dishesTable.sortOrder);
   res.json(dishes.map(formatDish));
 });
 
@@ -75,6 +85,7 @@ router.post("/dishes", async (req, res): Promise<void> => {
     .insert(dishesTable)
     .values({
       categoryId: parsed.data.categoryId ?? null,
+      subcategoryId: (req.body.subcategoryId !== undefined ? Number(req.body.subcategoryId) || null : null),
       name: parsed.data.name,
       description: parsed.data.description ?? null,
       price: parsed.data.price,
@@ -108,6 +119,7 @@ router.put("/dishes/:id", async (req, res): Promise<void> => {
   if (parsed.data.isAvailable !== undefined) updateData.isAvailable = parsed.data.isAvailable;
   if (parsed.data.sortOrder !== undefined) updateData.sortOrder = parsed.data.sortOrder;
   if ("categoryId" in parsed.data) updateData.categoryId = parsed.data.categoryId ?? null;
+  if ("subcategoryId" in req.body) updateData.subcategoryId = req.body.subcategoryId ? Number(req.body.subcategoryId) : null;
 
   const [dish] = await db
     .update(dishesTable)
@@ -161,3 +173,5 @@ router.patch("/dishes/:id/toggle", async (req, res): Promise<void> => {
 });
 
 export default router;
+
+

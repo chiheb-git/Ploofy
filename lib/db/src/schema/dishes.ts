@@ -1,11 +1,13 @@
-import { pgTable, serial, varchar, text, decimal, boolean, integer, timestamp } from "drizzle-orm/pg-core";
+﻿import { pgTable, serial, varchar, text, decimal, boolean, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { categoriesTable } from "./categories";
+import { subcategoriesTable } from "./subcategories";
 
 export const dishesTable = pgTable("dishes", {
   id: serial("id").primaryKey(),
   categoryId: integer("category_id").references(() => categoriesTable.id, { onDelete: "cascade" }),
+  subcategoryId: integer("subcategory_id").references(() => subcategoriesTable.id, { onDelete: "set null" }),
   name: varchar("name", { length: 150 }).notNull(),
   description: text("description"),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
@@ -19,3 +21,4 @@ export const dishesTable = pgTable("dishes", {
 export const insertDishSchema = createInsertSchema(dishesTable).omit({ id: true, createdAt: true });
 export type InsertDish = z.infer<typeof insertDishSchema>;
 export type Dish = typeof dishesTable.$inferSelect;
+

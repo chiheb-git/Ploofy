@@ -1,5 +1,5 @@
 ﻿import { useState, useMemo } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   useListDishes,
   getListDishesQueryKey,
@@ -57,6 +57,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+type Subcategory = { id: number; categoryId: number; name: string };
+
 const dishSchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
   description: z.string().optional(),
@@ -64,10 +68,23 @@ const dishSchema = z.object({
   imageUrl: z.string().url("URL invalide").optional().or(z.literal("")),
   modelGlbUrl: z.string().url("URL invalide").optional().or(z.literal("")),
   categoryId: z.coerce.number().optional(),
+  subcategoryId: z.coerce.number().optional(),
   isAvailable: z.boolean().default(true),
 });
 
 type DishFormValues = z.infer<typeof dishSchema>;
+
+function useSubcategories(categoryId?: number) {
+  return useQuery<Subcategory[]>({
+    queryKey: ["subcategories", categoryId],
+    queryFn: async () => {
+      if (!categoryId) return [];
+      const res = await fetch(`${API_BASE}/api/subcategories?category_id=${categoryId}`);
+      return res.json();
+    },
+    enabled: !!categoryId,
+  });
+}
 
 export default function DishesPage() {
   const queryClient = useQueryClient();
@@ -95,9 +112,13 @@ export default function DishesPage() {
       imageUrl: "",
       modelGlbUrl: "",
       categoryId: undefined,
+      subcategoryId: undefined,
       isAvailable: true,
     },
   });
+
+  const selectedCategoryId = form.watch("categoryId");
+  const { data: formSubcategories, isLoading: isLoadingSubs } = useSubcategories(selectedCategoryId);
 
   const handleOpenModal = (dish?: Dish) => {
     if (dish) {
@@ -109,6 +130,7 @@ export default function DishesPage() {
         imageUrl: dish.imageUrl || "",
         modelGlbUrl: dish.modelGlbUrl || "",
         categoryId: dish.categoryId || undefined,
+        subcategoryId: (dish as any).subcategoryId || undefined,
         isAvailable: dish.isAvailable,
       });
     } else {
@@ -120,6 +142,7 @@ export default function DishesPage() {
         imageUrl: "",
         modelGlbUrl: "",
         categoryId: categoryIdParam || (categories?.[0]?.id),
+        subcategoryId: undefined,
         isAvailable: true,
       });
     }
@@ -139,6 +162,7 @@ export default function DishesPage() {
       ...values,
       imageUrl: values.imageUrl || undefined,
       modelGlbUrl: values.modelGlbUrl || undefined,
+      subcategoryId: values.subcategoryId || null,
     };
 
     if (editingDish) {
@@ -331,7 +355,10 @@ export default function DishesPage() {
                       <FormItem>
                         <FormLabel>Categorie</FormLabel>
                         <Select
-                          onValueChange={(val) => field.onChange(parseInt(val))}
+                          onValueChange={(val) => {
+                            field.onChange(parseInt(val));
+                            form.setValue("subcategoryId", undefined);
+                          }}
                           defaultValue={field.value?.toString()}
                           value={field.value?.toString()}
                         >
@@ -344,6 +371,36 @@ export default function DishesPage() {
                             {categories?.map((cat) => (
                               <SelectItem key={cat.id} value={cat.id.toString()}>
                                 {cat.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="subcategoryId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Sous-categorie (optionnel)</FormLabel>
+                        <Select
+                          onValueChange={(val) => field.onChange(val === "none" ? undefined : parseInt(val))}
+                          value={field.value?.toString() || "none"}
+                          disabled={!selectedCategoryId || isLoadingSubs}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Aucune sous-categorie" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="none">Aucune</SelectItem>
+                            {formSubcategories?.map((sub) => (
+                              <SelectItem key={sub.id} value={sub.id.toString()}>
+                                {sub.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
