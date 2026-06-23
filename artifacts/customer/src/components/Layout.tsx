@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+﻿import { Link, useLocation } from "wouter";
 import { Menu, Box, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { href: "/about", icon: Info, label: "Info" },
   ];
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-background text-foreground pb-20">
+    <div className="min-h-[100dvh] flex flex-col text-foreground pb-20">
       <main className="flex-1 w-full relative">
         {children}
       </main>
@@ -32,3 +32,4 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
